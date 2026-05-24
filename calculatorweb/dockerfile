@@ -1,0 +1,17 @@
+# 使用官方 Python 镜像作为基础镜像
+FROM python:3.12
+
+# 设置工作目录 /app
+WORKDIR /app
+
+# 复制当前目录下的所有文件到工作目录
+COPY . /app
+
+# 安装应用程序依赖
+RUN pip install -r requirements.txt
+
+# 暴露应用程序需要的端口（Flask 默认 8080）
+EXPOSE 8080
+
+# 定义容器启动时运行的命令
+CMD ["python", "calculatorweb.py"]
