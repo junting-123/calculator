@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 使用官方 Python 镜像
 FROM python:3.12
 # 设置工作目录
@@ -15,3 +16,20 @@ COPY test_data.json .
 
 # 设置容器启动时执行的命令
 CMD ["python", "-m", "pytest", "test_api.py", "-v", "--alluredir=./allure-results"]
+=======
+# 使用官方 Python 基础镜像
+FROM python:3.12
+
+# 设置工作目录
+WORKDIR /test
+
+# 复制依赖文件并安装
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制项目文件
+COPY . .
+
+# 启动应用
+CMD ["pytest", "test_api.py", "-v"]
+>>>>>>> test
