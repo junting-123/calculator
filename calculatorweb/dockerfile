@@ -10,8 +10,8 @@ COPY . /app
 # 安装应用程序依赖
 RUN pip install -r requirements.txt
 
-# 暴露应用程序需要的端口（Flask 默认 8080）
-EXPOSE 8080
+# 暴露应用程序需要的端口
+EXPOSE 8081
 
 # 定义容器启动时运行的命令
 CMD ["python", "calculatorweb.py"]
