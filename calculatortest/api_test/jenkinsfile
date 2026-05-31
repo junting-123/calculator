@@ -50,18 +50,17 @@ pipeline {
     post {
         always {
             script {
-                def reportUrl = "${env.BUILD_URL}allure/"
-            
-            // 触发飞书通知
-                build job: 'send-feishu',
-                    parameters: [
-                        string(name: 'JOB_NAME', value: env.JOB_NAME),
-                        string(name: 'BUILD_NUMBER', value: env.BUILD_NUMBER),
-                        string(name: 'BUILD_URL', value: env.BUILD_URL),
-                        string(name: 'RESULT', value: currentBuild.result ?: 'SUCCESS')
-                ],
-                    wait: true
-                echo "📱 已触发飞书通知任务"
+                // 加载飞书通知脚本（load 方式，不触发独立任务）
+                def notify = load "${WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu"
+                
+                // 直接调用通知函数
+                notify(
+                    env.JOB_NAME,
+                    env.BUILD_NUMBER,
+                    env.BUILD_URL,
+                    currentBuild.result ?: 'SUCCESS'
+                )
+                echo "📱 飞书通知已发送"
             }
         }
         success {
