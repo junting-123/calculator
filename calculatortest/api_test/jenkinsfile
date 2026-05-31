@@ -46,16 +46,23 @@ pipeline {
     }
     
     post {
-    always {
-        script {
-            def notify = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu.groovy"
-            notify([
-                JOB_NAME: env.JOB_NAME,
-                BUILD_NUMBER: env.BUILD_NUMBER,
-                BUILD_URL: env.BUILD_URL,
-                RESULT: currentBuild.result ?: 'SUCCESS'
-            ])
-            echo "📱 飞书通知已发送"
+        always {
+            script {
+                def notify = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu.groovy"
+                notify([
+                    JOB_NAME: env.JOB_NAME,
+                    BUILD_NUMBER: env.BUILD_NUMBER,
+                    BUILD_URL: env.BUILD_URL,
+                    RESULT: currentBuild.result ?: 'SUCCESS'
+                ])
+                echo "📱 飞书通知已发送"
+            }
+        }
+        success {
+            echo '✅ 测试通过！'
+        }
+        failure {
+            echo '❌ 测试失败！'
         }
     }
 }
