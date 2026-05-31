@@ -49,7 +49,7 @@ pipeline {
         always {
             script {
                 // 修正：使用 env.WORKSPACE
-                def notify = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu"
+                def notify = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu.groovy"
                 notify(
                     env.JOB_NAME,
                     env.BUILD_NUMBER,
