@@ -1,12 +1,11 @@
 pipeline {
     agent any
     
-    // 1. 拉取测试代码
     stages {
         stage('拉取代码') {
             steps {
                 git branch: 'master',
-                    url: 'http://github.com/junting-123/calculator.git',
+                    url: 'https://github.com/junting-123/calculator.git',
                     credentialsId: 'github-token'
             }
         }
@@ -19,13 +18,12 @@ pipeline {
                 '''
             }
         }
+        
         stage('运行测试并生成Allure数据') {
             steps {
                 sh '''
                     cd calculatortest/api_test
-                    # 创建报告目录
                     mkdir -p allure-results
-                    # 运行测试并生成 Allure 数据
                     docker run --rm \
                         -v $(pwd)/allure-results:/tests/allure-results \
                         api-test:latest \
@@ -50,10 +48,8 @@ pipeline {
     post {
         always {
             script {
-                // 加载飞书通知脚本（load 方式，不触发独立任务）
-                def notify = load "${WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu"
-                
-                // 直接调用通知函数
+                // 修正：使用 env.WORKSPACE
+                def notify = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu"
                 notify(
                     env.JOB_NAME,
                     env.BUILD_NUMBER,
