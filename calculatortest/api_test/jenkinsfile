@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+    
+    // 1. 拉取测试代码
+    stages {
+        stage('拉取代码') {
+            steps {
+                git branch: 'master',
+                    url: 'http://github.com/junting-123/calculator.git',
+                    credentialsId: 'github-token'
+            }
+        }
+    
+        stage('构建测试镜像') {
+            steps {
+                sh '''
+                    cd calculatortest/api_test
+                    docker build -t api-test:latest .
+                '''
+            }
+        }
+        stage('运行测试并生成Allure数据') {
+            steps {
+                sh '''
+                    cd calculatortest/api_test
+                    # 创建报告目录
+                    mkdir -p allure-results
+                    # 运行测试并生成 Allure 数据
+                    docker run --rm \
+                        -v $(pwd)/allure-results:/tests/allure-results \
+                        api-test:latest \
+                        pytest test_api.py --alluredir=/tests/allure-results
+                '''
+            }
+        }
+        
+        stage('生成Allure报告') {
+            steps {
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'calculatortest/api_test/allure-results']]
+                ])
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                def reportUrl = "${env.BUILD_URL}allure/"
+            
+            // 触发飞书通知
+                build job: 'send-feishu',
+                    parameters: [
+                        string(name: 'JOB_NAME', value: env.JOB_NAME),
+                        string(name: 'BUILD_NUMBER', value: env.BUILD_NUMBER),
+                        string(name: 'BUILD_URL', value: env.BUILD_URL),
+                        string(name: 'RESULT', value: currentBuild.result ?: 'SUCCESS')
+                ],
+                    wait: true
+                echo "📱 已触发飞书通知任务"
+            }
+        }
+        success {
+            echo '✅ 测试通过！'
+        }
+        failure {
+            echo '❌ 测试失败！'
+        }
+    }
+}
