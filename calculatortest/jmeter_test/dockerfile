@@ -1,0 +1,13 @@
+# 修改 Dockerfile，使用 latest 标签
+FROM justb4/jmeter:latest
+
+WORKDIR /opt/jmeter/scripts
+
+# 复制测试脚本
+COPY xingneng.jmx .
+
+# 默认执行测试，生成结果和HTML报告
+CMD ["-n", \
+     "-t", "/opt/jmeter/scripts/xingneng.jmx", \
+     "-l", "/opt/jmeter/results/result.jtl", \
+     "-e", "-o", "/opt/jmeter/results/html-report"]
