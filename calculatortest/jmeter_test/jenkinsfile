@@ -36,6 +36,7 @@ pipeline{
                         -n -t /tests/xingneng.jmx -l /tests/results.jtl -e -o /tests/report
 
                         sudo chown -R junting:junting report
+                        sudo chown junting:junting results.jtl 2>/dev/null || true
                 '''
                 }
             }
