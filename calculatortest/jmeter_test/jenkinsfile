@@ -31,7 +31,7 @@ pipeline{
                     docker run --rm \
                         -v $(pwd):/tests \
                         jmeter_test:latest \
-                        jmeter -n -t /tests/xingneng.jmx -l /tests/results.jtl -e -o /tests/report
+                        -n -t /tests/xingneng.jmx -l /tests/results.jtl -e -o /tests/report
                 '''
                 }
             }
