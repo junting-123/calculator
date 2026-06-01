@@ -32,8 +32,12 @@ pipeline {
             }
         }
         
-        stage('生成Allure报告') {
-            steps {
+    }
+    
+    post {
+        always {
+            script {
+                // 1. 生成 Allure 报告（无论测试成功还是失败）
                 allure([
                     includeProperties: false,
                     jdk: '',
@@ -41,13 +45,8 @@ pipeline {
                     reportBuildPolicy: 'ALWAYS',
                     results: [[path: 'calculatortest/api_test/allure-results']]
                 ])
-            }
-        }
-    }
-    
-    post {
-        always {
-            script {
+
+                // 2. 发送飞书通知
                 def notify = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/send_feishu.groovy"
                 notify([
                     JOB_NAME: env.JOB_NAME,

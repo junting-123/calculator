@@ -1,0 +1,42 @@
+pipeline{
+    agent any
+
+    stages{
+        stage('拉取代码'){
+            steps{
+                git branch: 'master',
+                    url: 'https://github.com/junting-123/calculator.git',
+                    credentialsId: 'github-token'
+            }
+        }
+
+        stage('构建镜像'){
+            steps{
+                sh '''
+                    cd calculator/jmeter_test
+                    docker build -t jmeter_test:latest .
+                }
+            }
+
+        stage('运行测试并生成html数据'){
+            steps{
+                sh '''
+                    cd calculator/jmeter_test
+                    mkdir -p report
+                    jmeter -n -t xingneng.jmx -l results.jtl -e -o report
+                '''
+                }
+            }
+        }
+
+    post{
+        always{
+            script{
+
+            }
+        }
+    }
+
+
+    }
+}
