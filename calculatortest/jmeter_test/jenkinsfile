@@ -17,6 +17,7 @@ pipeline{
                 sh '''
                     cd calculator/jmeter_test
                     docker build -t jmeter_test:latest .
+                '''
                 }
             }
 
