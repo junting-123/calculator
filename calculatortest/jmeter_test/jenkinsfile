@@ -15,7 +15,7 @@ pipeline{
         stage('构建镜像'){
             steps{
                 sh '''
-                    cd calculator/jmeter_test
+                    cd calculatortest/jmeter_test
                     docker build -t jmeter_test:latest .
                 '''
                 }
@@ -24,7 +24,7 @@ pipeline{
         stage('运行测试并生成html数据'){
             steps{
                 sh '''
-                    cd calculator/jmeter_test
+                    cd calculatortest/jmeter_test
                     mkdir -p report
                     jmeter -n -t xingneng.jmx -l results.jtl -e -o report
                 '''
@@ -40,17 +40,17 @@ pipeline{
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
                 keepAll:true,
-                reportDir: 'calculator/jmeter_test/report',
+                reportDir: 'calculatortest/jmeter_test/report',
                 reportFiles: 'index.html',
                 reportName: 'Jmeter 性能测试报告'
             ]
 
             // 归档 JTL 文件
-            archiveArtifacts artifacts: 'calculator/jmeter_test/result.jtl',
+            archiveArtifacts artifacts: 'calculatortest/jmeter_test/result.jtl',
                                 allowEmptyArchive: true
 
             // 加载并发送飞书通知
-             def notify = load "${env.WORKSPACE}/calculator/jmeter_test/jenkinsfiles/send_feishu.groovy"
+             def notify = load "${env.WORKSPACE}/calculatortest/jmeter_test/jenkinsfiles/send_feishu.groovy"
                 notify([
                     JOB_NAME: env.JOB_NAME,
                     BUILD_NUMBER: env.BUILD_NUMBER,
