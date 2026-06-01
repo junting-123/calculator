@@ -4,9 +4,9 @@ pipeline{
     stages{
         stage('拉取代码'){
             steps{
-                retry(5){
+                retry(3){
                    git branch: 'master',
-                    url: 'git@gihub.com:junting-123/calculator.git',
+                    url: 'git@github.com:junting-123/calculator.git',
                     credentialsId: '' 
                 }
             }
