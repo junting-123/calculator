@@ -29,7 +29,6 @@ pipeline{
 
                     # 使用 Docker 容器运行 JMeter
                     docker run --rm \
-                        \\让容器直接使用宿主机的网络栈
                         --network host \
                         -v $(pwd):/tests \
                         jmeter_test:latest \
