@@ -4,9 +4,11 @@ pipeline{
     stages{
         stage('拉取代码'){
             steps{
-                git branch: 'master',
+                retry(3){
+                   git branch: 'master',
                     url: 'https://github.com/junting-123/calculator.git',
-                    credentialsId: 'github-token'
+                    credentialsId: 'github-token' 
+                }
             }
         }
 
@@ -32,11 +34,36 @@ pipeline{
     post{
         always{
             script{
+            // 发布 HTML 报告到 Jenkins
+            publishHTML target:[
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll:true,
+                reportDir: 'calculator/jmeter_test/report',
+                reportFiles: 'index.html',
+                reportName: 'Jmeter 性能测试报告'
+            ]
 
+            // 归档 JTL 文件
+            archiveArtifacts artifacts: 'calculator/jmeter_test/result.jtl',
+                                allowEmptyArchive: true
+
+            // 加载并发送飞书通知
+             def notify = load "${env.WORKSPACE}/calculator/jmeter_test/jenkinsfiles/send_feishu.groovy"
+                notify([
+                    JOB_NAME: env.JOB_NAME,
+                    BUILD_NUMBER: env.BUILD_NUMBER,
+                    BUILD_URL: env.BUILD_URL,
+                    RESULT: currentBuild.result ?: 'SUCCESS'
+                ])
+                echo "📱 飞书通知已发送"
             }
         }
-    }
-
-
+        success {
+            echo '✅ 性能测试通过！'
+        }
+        failure {
+            echo '❌ 性能测试失败！'
+        }
     }
 }
