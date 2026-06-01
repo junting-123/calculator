@@ -25,7 +25,7 @@ pipeline{
             steps{
                 sh '''
                     cd calculatortest/jmeter_test
-                    rm -rf report/*   # 清空旧报告
+                    sudo rm -rf report   # 清空旧报告
                     mkdir -p report
 
                     # 使用 Docker 容器运行 JMeter
@@ -34,6 +34,8 @@ pipeline{
                         -v $(pwd):/tests \
                         jmeter_test:latest \
                         -n -t /tests/xingneng.jmx -l /tests/results.jtl -e -o /tests/report
+
+                        sudo chown -R junting:junting report
                 '''
                 }
             }
