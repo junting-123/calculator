@@ -26,7 +26,12 @@ pipeline{
                 sh '''
                     cd calculatortest/jmeter_test
                     mkdir -p report
-                    jmeter -n -t xingneng.jmx -l results.jtl -e -o report
+
+                    # 使用 Docker 容器运行 JMeter
+                    docker run --rm \
+                        -v $(pwd):/tests \
+                        jmeter_test:latest \
+                        jmeter -n -t /tests/xingneng.jmx -l /tests/results.jtl -e -o /tests/report
                 '''
                 }
             }
