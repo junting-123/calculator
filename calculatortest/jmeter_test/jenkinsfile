@@ -71,7 +71,8 @@ pipeline{
                     JOB_NAME: env.JOB_NAME,
                     BUILD_NUMBER: env.BUILD_NUMBER,
                     BUILD_URL: env.BUILD_URL,
-                    RESULT: currentBuild.result ?: 'SUCCESS'
+                    RESULT: currentBuild.result ?: 'SUCCESS'，
+                    REPORT_URL: "${env.BUILD_URL}JMeter_20性能测试报告/"  // 指向性能报告
                 ])
                 echo "📱 飞书通知已发送"
             }
