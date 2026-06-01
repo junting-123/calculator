@@ -25,6 +25,7 @@ pipeline{
             steps{
                 sh '''
                     cd calculatortest/jmeter_test
+                    rm -rf report/*   # 清空旧报告
                     mkdir -p report
 
                     # 使用 Docker 容器运行 JMeter
