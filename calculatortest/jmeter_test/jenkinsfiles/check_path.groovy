@@ -26,7 +26,7 @@ def call(String targetPath){
         }
     }
 
-    // 没有相关更新
+    // 没有相关更新1
     println "❌ 没有检测到 ${targetPath} 的变更,跳过构建"
     return false
 }
