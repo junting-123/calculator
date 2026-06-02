@@ -6,8 +6,8 @@ pipeline {
             steps {
                 retry(3){ // 失败后重试3次
                     git branch: 'master',
-                        url: 'https://github.com/junting-123/calculator.git',
-                        credentialsId: 'github-token'
+                        url: 'git@github.com:junting-123/calculator.git',
+                        credentialsId: ''
                 }
             }
         }
