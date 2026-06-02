@@ -26,7 +26,7 @@ pipeline{
                 sh '''
                     cd calculatortest/jmeter_test
                     sudo rm -rf report   # 清空旧报告
-                    sufo rm -f result.jtl
+                    sudo rm -f result.jtl
                     mkdir -p report
 
                     # 使用 Docker 容器运行 JMeter
