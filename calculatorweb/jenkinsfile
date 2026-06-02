@@ -1,0 +1,127 @@
+pipeline {
+    agent any
+
+    // 可选：添加参数，允许手动构建时跳过路径检查
+    parameters {
+        booleanParam(name: 'SKIP_PATH_CHECK', defaultValue: false, description: '手动构建时跳过路径检查')
+    }
+
+    stages {
+        // 新增：检查变更路径的 stage
+        stage('检查变更路径') {
+            when {
+                expression { !params.SKIP_PATH_CHECK }  // 手动构建时可跳过检查
+            }
+            steps {
+                script {
+                    // 加载 checkPath 函数
+                    def check_path = load "${env.WORKSPACE}/calculatorweb/jenkinsfiles/check_path.groovy"
+                    
+                    // 检查是否是 calculatorweb 目录的变更
+                    def shouldRun = check_path('calculatorweb/')
+                    
+                    if (!shouldRun) {
+                        echo "⏭️ 没有检测到 calculatorweb 目录的变更，跳过构建"
+                        currentBuild.result = 'SUCCESS'
+                        // 使用 error 但标记为 ABORTED，这样 post 不会执行
+                        currentBuild.description = 'SKIPPED'
+                        return
+                    }
+                }
+            }
+        }
+    
+        stage('拉取代码') {
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
+            steps {
+                retry(3){ // 失败后重试3次
+                    git branch: 'master',
+                        url: 'git@github.com:junting-123/calculator.git',
+                        credentialsId: ''
+                }
+            }
+        }
+
+        stage('清理旧镜像') {
+            when {
+                expression { currentBuild.description != 'SKIPPED' }
+            }
+            steps {
+                sh '''
+                    echo "=== 删除旧镜像 ==="
+                    docker rmi calculatorweb:latest || true
+                '''
+            }
+        }
+    
+        stage('构建镜像') {
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
+            steps {
+                sh '''
+                    cd calculatorweb
+                    docker build -t calculatorweb:latest .
+                '''
+            }
+        }
+
+        stage('部署到服务器') {
+            when {
+                expression { currentBuild.description != 'SKIPPED' }
+            }
+            steps {
+                sh '''
+                    echo "=== 停止旧容器 ==="
+                    docker stop calculatorweb || true
+                    docker rm calculatorweb || true
+                    
+                    echo "=== 启动新容器 ==="
+                    docker run -d \
+                        --name calculatorweb \
+                        -p 8081:8081 \
+                        calculatorweb:latest
+                    
+                    echo "=== 部署完成 ==="
+                '''
+            }
+        }
+
+    }
+    
+    post {
+        always {
+            script {
+                // 只有不是被跳过的构建，才执行
+                if (currentBuild.description != 'SKIPPED'){
+                def notify = load "${env.WORKSPACE}/calculatorweb/jenkinsfiles/send_feishu.groovy"
+
+                notify([
+                    JOB_NAME: env.JOB_NAME,
+                    BUILD_NUMBER: env.BUILD_NUMBER,
+                    BUILD_URL: env.BUILD_URL,
+                    RESULT: currentBuild.result ?: 'SUCCESS'
+                ])
+                echo "📱 飞书通知已发送"
+                }
+                else{
+                    echo "⏭️ 构建被跳过，不生成通知"
+                }
+            }
+        }
+
+        success {
+            echo '✅ 部署通过！'
+        }
+
+        failure {
+            echo '❌ 部署失败！'
+        }
+
+        aborted {
+            echo '⏭️ 流水线被跳过（路径不匹配）'
+        }
+    }
+}
