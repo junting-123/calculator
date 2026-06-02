@@ -36,7 +36,7 @@ pipeline {
                 expression { currentBuild.description != 'SKIPPED' }
             }
             steps {
-                retry(3){ // 失败后重试3
+                retry(3){ // 失败后重试
                     git branch: 'master',
                         url: 'git@github.com:junting-123/calculator.git',
                         credentialsId: ''
