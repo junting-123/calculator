@@ -33,7 +33,7 @@ pipeline{
                         --network host \
                         -v $(pwd):/tests \
                         jmeter_test:latest \
-                        -n -t /tests/xingneng.jmx -l /tests/results.jtl
+                        -n -t /tests/xingneng.jmx -l /tests/results.jtl -e -o /tests/report
 
                 '''
                 }
