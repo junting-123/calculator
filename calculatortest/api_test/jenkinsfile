@@ -1,7 +1,34 @@
 pipeline {
     agent any
-    
+
+         // 可选：添加参数，允许手动构建时跳过路径检查
+    parameters {
+        booleanParam(name: 'SKIP_PATH_CHECK', defaultValue: false, description: '手动构建时跳过路径检查')
+    }
+
     stages {
+        // 新增：检查变更路径的 stage
+        stage('检查变更路径') {
+            when {
+                expression { !params.SKIP_PATH_CHECK }  // 手动构建时可跳过检查
+            }
+            steps {
+                script {
+                    // 加载 checkPath 函数
+                    def check_path = load "${env.WORKSPACE}/calculatortest/api_test/jenkinsfiles/check_path.groovy"
+                    
+                    // 检查是否是 api_test 目录的变更
+                    def shouldRun = check_path('calculatortest/api_test/')
+                    
+                    if (!shouldRun) {
+                        echo "⏭️ 没有检测到 api_test 目录的变更，跳过构建"
+                        currentBuild.result = 'SUCCESS'
+                        error('SKIP_BUILD')  // 中止流水线，但标记为成功
+                    }
+                }
+            }
+        }
+    
         stage('拉取代码') {
             steps {
                 retry(3){ // 失败后重试3次
