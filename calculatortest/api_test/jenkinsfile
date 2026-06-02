@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-         // 可选：添加参数，允许手动构建时跳过路径检查
+    // 可选：添加参数，允许手动构建时跳过路径检查
     parameters {
         booleanParam(name: 'SKIP_PATH_CHECK', defaultValue: false, description: '手动构建时跳过路径检查')
     }
