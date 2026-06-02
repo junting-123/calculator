@@ -7,7 +7,7 @@ pipeline {
     }
 
     stages {
-        // 新增：检查变更路径的 stage
+        // 新增：检查变更路径的 stage1
         stage('检查变更路径') {
             when {
                 expression { !params.SKIP_PATH_CHECK }  // 手动构建时可跳过检查
