@@ -25,7 +25,8 @@ pipeline{
                         currentBuild.result = 'SUCCESS'
                         // 使用 error 但标记为 ABORTED，这样 post 不会执行
                         currentBuild.description = 'SKIPPED'
-                        error('SKIP_PIPELINE')
+                        // 添加 return，退出当前 stage 的 script 块
+                        return
                     }
                 }
             }
@@ -33,6 +34,9 @@ pipeline{
 
 
         stage('拉取代码'){
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
             steps{
                 retry(3){
                    git branch: 'master',
@@ -43,6 +47,9 @@ pipeline{
         }
 
         stage('构建镜像'){
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
             steps{
                 sh '''
                     cd calculatortest/jmeter_test
@@ -52,6 +59,9 @@ pipeline{
             }
 
         stage('运行测试并生成html数据'){
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
             steps{
                 sh '''
                     cd calculatortest/jmeter_test
@@ -110,19 +120,11 @@ pipeline{
         }
 
         success {
-            script{
-                if (currentBuild.description != 'SKIPPED') {
-                    echo '✅ 性能测试通过！'
-                }
-            }
+            echo '✅ 性能测试通过！'
         }
 
         failure {
-            script {
-                if (currentBuild.description != 'SKIPPED') {
-                    echo '❌ 测试失败！'
-                }
-            }
+            echo '❌ 性能测试失败！'
         }
 
         aborted{
