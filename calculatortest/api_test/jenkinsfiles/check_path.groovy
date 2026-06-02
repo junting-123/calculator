@@ -30,3 +30,5 @@ def call(String targetPath){
     println "❌ 没有检测到 ${targetPath} 的变更,跳过构建"
     return false
 }
+
+    return this
