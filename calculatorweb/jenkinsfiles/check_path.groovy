@@ -12,7 +12,7 @@ def call(String targetPath){
         }
     }
 
-    // 如果没有变更记录 (手动构建、定时执行)，默认执行
+    // 如果没有变更记录 (手动构建、定时执行)， 默认执行
     if (changedFiles.isEmpty()){
         println "⏭️ 无变更记录（手动/定时构建），默认执行"
         return true
