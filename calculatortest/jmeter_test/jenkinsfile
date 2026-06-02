@@ -57,7 +57,7 @@ pipeline{
                 reportName: 'Jmeter 性能测试报告'
             ]
 
-            // 归档 JTL 文件1
+            // 归档 JTL 文件
             archiveArtifacts artifacts: 'calculatortest/jmeter_test/result.jtl',
                                 allowEmptyArchive: true
 
