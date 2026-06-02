@@ -74,8 +74,17 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "=== 停止旧容器 ==="
-                    docker stop calculatorweb || true
+                    echo "=== 停止占用 8081 端口的容器  ==="
+                    # 查找占用 8081 端口的容器
+                    CONTAINER_ID=$(docker ps -q --filter "publish=8081")
+                    if [ -n "$CONTAINER_ID" ]; then
+                        echo "停止容器: $CONTAINER_ID"
+                        docker stop $CONTAINER_ID
+                        docker rm $CONTAINER_ID
+                    fi
+            
+                    # 同时也停止 calculatorweb 容器（如果存在）
+                     docker stop calculatorweb || true
                     docker rm calculatorweb || true
                     
                     echo "=== 启动新容器 ==="
