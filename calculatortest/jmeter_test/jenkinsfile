@@ -102,7 +102,7 @@ pipeline{
             archiveArtifacts artifacts: 'calculatortest/jmeter_test/results.jtl',
                                 allowEmptyArchive: true
 
-            // 加载并发送飞书通知1
+            // 加载并发送飞书通知
              def notify = load "${env.WORKSPACE}/calculatortest/jmeter_test/jenkinsfiles/send_feishu.groovy"
                 notify([
                     JOB_NAME: env.JOB_NAME,
