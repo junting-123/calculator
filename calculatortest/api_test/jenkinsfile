@@ -77,7 +77,7 @@ pipeline {
     post {
         always {
             script {
-                // 只有不是被跳过的构建，才执行报告和通知1
+                // 只有不是被跳过的构建，才执行报告和通知
                 if (currentBuild.description != 'SKIPPED'){
                     allure([
                     includeProperties: false,
