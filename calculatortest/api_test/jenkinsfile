@@ -23,7 +23,8 @@ pipeline {
                     if (!shouldRun) {
                         echo "⏭️ 没有检测到 api_test 目录的变更，跳过构建"
                         currentBuild.result = 'SUCCESS'
-                        error('SKIP_BUILD')  // 中止流水线，但标记为成功
+                        // 使用 error 但标记为 ABORTED，这样 post 不会执行
+                        error('SKIP_PIPELINE')
                     }
                 }
             }
@@ -66,8 +67,9 @@ pipeline {
     post {
         always {
             script {
-                // 1. 生成 Allure 报告（无论测试成功还是失败）
-                allure([
+                // 只有不是被跳过的构建，才执行报告和通知
+                if (currentBuild.result != 'ABORTED'){
+                    allure([
                     includeProperties: false,
                     jdk: '',
                     properties: [],
@@ -84,6 +86,7 @@ pipeline {
                     RESULT: currentBuild.result ?: 'SUCCESS'
                 ])
                 echo "📱 飞书通知已发送"
+                }
             }
         }
         success {
@@ -91,6 +94,9 @@ pipeline {
         }
         failure {
             echo '❌ 测试失败！'
+        }
+        aborted {
+            echo '⏭️ 流水线被跳过（路径不匹配）'
         }
     }
 }
