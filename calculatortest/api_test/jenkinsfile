@@ -23,7 +23,7 @@ pipeline {
                     if (!shouldRun) {
                         echo "⏭️ 没有检测到 api_test 目录的变更，跳过构建"
                         currentBuild.result = 'SUCCESS'
-                        // 使用 error 但标记为 ABORTED，这样 post 不会执行
+                        // 使用 error 但标记为 ABORTED，这样 post不会执行
                         currentBuild.description = 'SKIPPED'
                         return
                     }
