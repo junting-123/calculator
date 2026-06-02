@@ -24,6 +24,7 @@ pipeline {
                         echo "⏭️ 没有检测到 api_test 目录的变更，跳过构建"
                         currentBuild.result = 'SUCCESS'
                         // 使用 error 但标记为 ABORTED，这样 post 不会执行
+                        currentBuild.description = 'SKIPPED'
                         error('SKIP_PIPELINE')
                     }
                 }
@@ -68,7 +69,7 @@ pipeline {
         always {
             script {
                 // 只有不是被跳过的构建，才执行报告和通知
-                if (currentBuild.result != 'ABORTED'){
+                if (currentBuild.description != 'SKIPPED'){
                     allure([
                     includeProperties: false,
                     jdk: '',
