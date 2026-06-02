@@ -94,7 +94,10 @@ pipeline {
             echo '✅ 测试通过！'
         }
         failure {
-            echo '❌ 测试失败！'
+            //// 只有不是被跳过的构建，才输出失败信息
+            if (currentBuild.description != 'SKIPPED') {
+                echo '❌ 测试失败！'
+            }
         }
         aborted {
             echo '⏭️ 流水线被跳过（路径不匹配）'

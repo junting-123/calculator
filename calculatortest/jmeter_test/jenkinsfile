@@ -112,7 +112,10 @@ pipeline{
             echo '✅ 性能测试通过！'
         }
         failure {
-            echo '❌ 性能测试失败！'
+            // 只有不是被跳过的构建，才输出失败信息
+            if (currentBuild.description != 'SKIPPED') {
+                echo '❌ 性能测试失败！'
+            }
         }
     }
 }
