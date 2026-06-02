@@ -35,14 +35,6 @@ pipeline{
                         jmeter_test:latest \
                         -n -t /tests/xingneng.jmx -l /tests/results.jtl
 
-                        # 2. 从 JTL 生成报告
-                    docker run --rm \
-                        -v $(pwd):/tests \
-                        jmeter_test:latest \
-                        -g /tests/results.jtl -o /tests/report
-
-                    sudo chown -R junting:junting report
-                    sudo chown junting:junting results.jtl 2>/dev/null || true
                 '''
                 }
             }
