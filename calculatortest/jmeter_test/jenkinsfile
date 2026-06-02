@@ -25,7 +25,7 @@ pipeline{
                         currentBuild.result = 'SUCCESS'
                         // 使用 error 但标记为 ABORTED，这样 post 不会执行
                         currentBuild.description = 'SKIPPED'
-                        // 添加 return，退出当前 stage 的 script块
+                        // 添加 return，退出当前 stage 的 script 块
                         return
                     }
                 }
