@@ -32,6 +32,9 @@ pipeline {
         }
     
         stage('拉取代码') {
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
             steps {
                 retry(3){ // 失败后重试3次
                     git branch: 'master',
@@ -42,6 +45,9 @@ pipeline {
         }
     
         stage('构建测试镜像') {
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
             steps {
                 sh '''
                     cd calculatortest/api_test
@@ -51,6 +57,9 @@ pipeline {
         }
         
         stage('运行测试并生成Allure数据') {
+            when{
+                expression { currentBuild.description != 'SKIPPED' }
+            }
             steps {
                 sh '''
                     cd calculatortest/api_test
@@ -91,20 +100,12 @@ pipeline {
             }
         }
         success {
-            script{
-                if (currentBuild.description != 'SKIPPED'){
-                    echo '✅ 测试通过！'
-                }
-            }
+            echo '✅ 接口测试通过！'
         }
         failure {
-            script{
-                if (currentBuild.description != 'SKIPPED') {
-                echo '❌ 测试失败！'
-                }
-            }
+            echo '❌ 接口测试失败！'
         }
-        
+
         aborted {
             echo '⏭️ 流水线被跳过（路径不匹配）'
         }
